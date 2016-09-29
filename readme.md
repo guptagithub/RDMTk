@@ -1,6 +1,6 @@
 # RDMTk
 
-The [Risky Decision Making Toolkit (RDMTk)](https://rdmtk.wise.cs.wmich.edu/) represents a collective experience of experts and resources geared towards research in decision-making and, in particular, RDM. Researchers benefit from incorporating best practices, tools and techniques at one convenient place. The toolkit allows automation of commonly practiced activities and integrating external tools, such as mTurk, Qualtrics, etc. to use for empirical studies. Bundling data analysis tools along with empirical experimentation features empowers researchers and practitioners to identify decision patterns with ease. 
+The **Risky Decision Making Toolkit (RDMTk)** represents a collective experience of experts and resources geared towards research in decision-making and, in particular, RDM. Researchers benefit from incorporating best practices, tools and techniques at one convenient place. The toolkit allows automation of commonly practiced activities and integrating external tools, such as mTurk, Qualtrics, etc. to use for empirical studies. Bundling data analysis tools along with empirical experimentation features empowers researchers and practitioners to identify decision patterns with ease. 
 
 ## Official Documentation
 
