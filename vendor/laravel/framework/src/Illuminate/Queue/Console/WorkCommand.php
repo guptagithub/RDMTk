@@ -1,113 +1,82 @@
-<?php namespace Illuminate\Queue\Console;
+<?php
 
-use Illuminate\Queue\Worker;
+namespace Illuminate\Queue\Console;
+
 use Illuminate\Console\Command;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
-class WorkCommand extends Command {
+class WorkCommand extends Command
+{
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'queue:work';
 
-	/**
-	 * The console command name.
-	 *
-	 * @var string
-	 */
-	protected $name = 'queue:work';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Start processing jobs from the queue';
 
-	/**
-	 * The console command description.
-	 *
-	 * @var string
-	 */
-	protected $description = 'Process the next job on a queue';
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        $process = $this->newProxyProcess();
 
-	/**
-	 * The queue listener instance.
-	 *
-	 * @var \Illuminate\Queue\Listener
-	 */
-	protected $worker;
+        exit($process->run(function ($type, $line) {
+            if (trim($line) !== '.') {
+                $this->output->write($line);
+            }
+        }));
+    }
 
-	/**
-	 * Create a new queue listen command.
-	 *
-	 * @param  \Illuminate\Queue\Worker  $worker
-	 * @return void
-	 */
-	public function __construct(Worker $worker)
-	{
-		parent::__construct();
+    /**
+     * Get a new proxy process to the daemon command.
+     *
+     * @return Process
+     */
+    protected function newProxyProcess()
+    {
+        $_SERVER['argv'][1] = 'queue:daemon';
 
-		$this->worker = $worker;
-	}
+        return (new Process(PHP_BINARY.' '.implode(' ', $_SERVER['argv']), getcwd()))
+                    ->setTimeout(null)
+                    ->setIdleTimeout($this->option('timeout') + $this->option('sleep'));
+    }
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return void
-	 */
-	public function fire()
-	{
-		if ($this->downForMaintenance()) return;
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
 
-		$queue = $this->option('queue');
+            ['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode (Deprecated)'],
 
-		$delay = $this->option('delay');
+            ['once', null, InputOption::VALUE_NONE, 'Only process the next job on the queue'],
 
-		// The memory limit is the amount of memory we will allow the script to occupy
-		// before killing it and letting a process manager restart it for us, which
-		// is to protect us against any memory leaks that will be in the scripts.
-		$memory = $this->option('memory');
+            ['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
 
-		$connection = $this->argument('connection');
+            ['force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'],
 
-		$this->worker->pop($connection, $queue, $delay, $memory, $this->option('sleep'), $this->option('tries'));
-	}
+            ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
-	/**
-	 * Determine if the worker should run in maintenance mode.
-	 *
-	 * @return bool
-	 */
-	protected function downForMaintenance()
-	{
-		if ($this->option('force')) return false;
+            ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
 
-		return $this->laravel->isDownForMaintenance();
-	}
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a child process can run', 60],
 
-	/**
-	 * Get the console command arguments.
-	 *
-	 * @return array
-	 */
-	protected function getArguments()
-	{
-		return array(
-			array('connection', InputArgument::OPTIONAL, 'The name of connection', null),
-		);
-	}
-
-	/**
-	 * Get the console command options.
-	 *
-	 * @return array
-	 */
-	protected function getOptions()
-	{
-		return array(
-			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'),
-
-			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
-
-			array('force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'),
-
-			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
-
-			array('sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3),
-
-			array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
-		);
-	}
-
+            ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
+        ];
+    }
 }

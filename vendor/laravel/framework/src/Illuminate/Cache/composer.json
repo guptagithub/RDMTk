@@ -1,32 +1,38 @@
 {
     "name": "illuminate/cache",
+    "description": "The Illuminate Cache package.",
     "license": "MIT",
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylor@laravel.com"
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.1.*",
-        "nesbot/carbon": "1.*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "4.0.*",
-        "illuminate/database": "4.1.*",
-        "illuminate/encryption": "4.1.*",
-        "illuminate/filesystem": "4.1.*",
-        "illuminate/redis": "4.1.*"
+        "php": ">=5.6.4",
+        "illuminate/contracts": "5.3.*",
+        "illuminate/support": "5.3.*",
+        "nesbot/carbon": "~1.20"
     },
     "autoload": {
-        "psr-0": {"Illuminate\\Cache": ""}
+        "psr-4": {
+            "Illuminate\\Cache\\": ""
+        }
     },
-    "target-dir": "Illuminate/Cache",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.1-dev"
+            "dev-master": "5.3-dev"
         }
+    },
+    "suggest": {
+        "illuminate/database": "Required to use the database cache driver (5.3.*).",
+        "illuminate/filesystem": "Required to use the file cache driver (5.3.*).",
+        "illuminate/redis": "Required to use the redis cache driver (5.3.*)."
     },
     "minimum-stability": "dev"
 }
